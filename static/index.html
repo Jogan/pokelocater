@@ -1,5 +1,6 @@
 <head>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="extrastyle.css">
 </head>
 
 <style>
@@ -15,6 +16,10 @@
     }
 </style>
 
+<button id="more-button">
+    Load More
+</button>
+
 <div id="map_wrapper">
     <div id="map_canvas" class="mapping">Detecting location...</div>
 </div>
@@ -25,6 +30,60 @@
     var infoWindowContent = [];
     var marker_images = [];
     var first_load = true;
+    var savedLocationLat = 0;
+    var savedLocationLong = 0;
+    var steps = 1;
+    var steplimit = 5;
+    var pos = 1;
+    var default_step = 0.001;
+    var moreCount = 1;
+
+
+
+    $("#more-button").click(function() {
+        if (savedLocationLat !== 0 && savedLocationLong !== 0) {
+            console.log("More button clicked");
+
+            var offset = (steps*default_step);
+
+            if (pos === 1) {
+                console.log(" -> Zone 1");
+                build_map_update({ 
+                    coords: { 
+                        latitude: savedLocationLat+offset, 
+                        longitude: savedLocationLong-offset
+                    }});
+            }
+            else if (pos === 2) {
+                console.log(" -> Zone 2");
+                build_map_update({ 
+                    coords: { 
+                        latitude: savedLocationLat+offset, 
+                        longitude: savedLocationLong+offset
+                    }});
+            }
+            else if (pos === 3) {
+                console.log(" -> Zone 3");
+                build_map_update({ 
+                    coords: { 
+                        latitude: savedLocationLat-offset, 
+                        longitude: savedLocationLong-offset
+                    }});
+            }
+            else if (pos === 4) {
+                console.log(" -> Zone 4");
+                build_map_update({ 
+                    coords: { 
+                        latitude: savedLocationLat-offset, 
+                        longitude: savedLocationLong+offset
+                    }});
+                pos = 0;
+                steps += 1;
+            }
+            pos += 1;
+            moreCount += 1;
+        }
+    });
 
     jQuery(function($) {
         // Asynchronously Load the map API 
@@ -47,7 +106,8 @@
     	infoWindowContent.push(infoWindowContent_obj);
     	marker_images.push("/static/poke/trainer.gif");
     	create_map();
-    	first_load = false;
+        savedLocationLat = location.coords.latitude;
+        savedLocationLong = location.coords.longitude;
     	build_map_update(location);
     }
 
@@ -59,15 +119,20 @@
     		dataType: 'json',
     		success: function (data) {
     			console.log("pokemon_data", data.data);
-    			markers = [];
     			infoWindowContent = [];
-    			marker_images = [];
     			
-    			marker_obj = ["Ashe", location.coords.latitude,location.coords.longitude];
-    			markers.push(marker_obj);
-    			infoWindowContent_obj = ['<div class="info_content"><h3>You</h3></div>'];
-    			infoWindowContent.push(infoWindowContent_obj);
-    			marker_images.push("/static/poke/trainer.gif");
+                if (first_load) {
+                    first_load = false;
+        			marker_obj = ["Ashe", location.coords.latitude,location.coords.longitude];
+        			markers.push(marker_obj);
+        			infoWindowContent_obj = ['<div class="info_content"><h3>You</h3></div>'];
+        			infoWindowContent.push(infoWindowContent_obj);
+        			marker_images.push("/static/poke/trainer.gif");
+                } else {
+                    marker_obj = ["Update_" + moreCount,location.coords.latitude,location.coords.longitude];
+                    markers.push(marker_obj);
+                    marker_images.push("/static/poke/update.gif");
+                }
     			
     			$.each(data.data, function(k, v) {
     				marker_obj = [v.name, v.latitude,v.longitude];
@@ -82,15 +147,15 @@
 
     			$('#map_canvas').html('');
     			create_map();
-    			setTimeout(function(){
-    				navigator.geolocation.getCurrentPosition(handler);
-    			}, 60000);
+    			// setTimeout(function(){
+    			// 	navigator.geolocation.getCurrentPosition(handler);
+    			// }, 60000);
     		},
     		error: function() {
     			console.log('Error while attempting to retrieve poke locations');
-    			setTimeout(function(){
-    				navigator.geolocation.getCurrentPosition(handler);
-    			}, 5000);
+    			// setTimeout(function(){
+    			// 	navigator.geolocation.getCurrentPosition(handler);
+    			// }, 5000);
     		}
     	});
     }
