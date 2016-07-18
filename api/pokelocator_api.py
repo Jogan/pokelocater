@@ -402,8 +402,13 @@ def main(location=None):
 
     nearby_pokes = []
 
+    steps = 0
+    pos = 1
+    stepLimit = 3
+    default_step = 0.001
+
     origin = LatLng.from_degrees(FLOAT_LAT, FLOAT_LONG)
-    while True:
+    while steps < stepLimit:
         original_lat = FLOAT_LAT
         original_long = FLOAT_LONG
         parent = CellId.from_lat_lng(LatLng.from_degrees(FLOAT_LAT, FLOAT_LONG)).parent(15)
@@ -461,7 +466,19 @@ def main(location=None):
 
             print("(%s) %s is visible at (%s, %s) for %s seconds (%sm %s from you)" % (poke.pokemon.PokemonId, pokemons[poke.pokemon.PokemonId - 1]['Name'], poke.Latitude, poke.Longitude, poke.TimeTillHiddenMs / 1000, int(origin.get_distance(other).radians * 6366468.241830914), direction))
 
-        break
+        offset = (steps*default_step)
+        if pos is 1:
+            set_location_coords(latlng.lat().degrees+offset, latlng.lng().degrees-offset, 0)
+        elif pos is 2:
+            set_location_coords(latlng.lat().degrees+offset, latlng.lng().degrees+offset, 0)
+        elif pos is 3:
+            set_location_coords(latlng.lat().degrees-offset, latlng.lng().degrees-offset, 0)
+        elif pos is 4:
+            set_location_coords(latlng.lat().degrees-offset, latlng.lng().degrees+offset, 0)
+            pos = 0
+            steps+=1
+        pos += 1
+        print "Completed:",((steps+(pos*.25)-.25)/steplimit)*100,"%"
 
     return nearby_pokes
 
