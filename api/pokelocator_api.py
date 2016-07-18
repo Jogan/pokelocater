@@ -120,7 +120,7 @@ def api_req(login_type, api_endpoint, access_token, *mehs, **kw):
             print("\n\n")
 
         print("Sleeping for 2 seconds to get around rate-limit.")
-        time.sleep(2)
+        time.sleep(1.5)
         return p_ret
     except Exception, e:
         if DEBUG:
@@ -404,7 +404,7 @@ def main(location=None):
 
     steps = 0
     pos = 1
-    stepLimit = 3
+    stepLimit = 2
     default_step = 0.001
 
     origin = LatLng.from_degrees(FLOAT_LAT, FLOAT_LONG)
