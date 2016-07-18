@@ -30,7 +30,8 @@ var first_load = true;
 jQuery(function($) {
     // Asynchronously Load the map API 
     var script = document.createElement('script');
-    script.src = "//maps.googleapis.com/maps/api/js?key=AIzaSyA18RVaHFv4YmvoQHpeb-_WzDTkYRAP_IM&sensor=false&callback=map_api_loaded";
+    var key = 'AIzaSyC2h_My0BsFI5IxfMkUr0G8iFrS5FI3DA4';
+    script.src = "//maps.googleapis.com/maps/api/js?key=" + key + "&sensor=false&callback=map_api_loaded";
     document.body.appendChild(script);
 });
 
