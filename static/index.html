@@ -26,6 +26,11 @@
 
 <script>
 
+	// Push over to https
+	if (window.location.protocol != "https:") {
+		window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
+	}
+
     var markers = [];
     var infoWindowContent = [];
     var marker_images = [];
@@ -209,6 +214,18 @@
             // Automatically center the map fitting all markers on the screen
             map.fitBounds(bounds);
         }
+		
+		 //Add a radius marker @300m
+		new google.maps.Circle({
+			strokeColor: '#FF0000',
+			strokeOpacity: 0.8,
+			strokeWeight: 2,
+			fillColor: '#FF0000',
+			fillOpacity: 0,
+			map: map,
+			center: new google.maps.LatLng(markers[0][1], markers[0][2]),
+			radius: 300
+		});
 
         // Override our map zoom level once our fitBounds function runs (Make sure it only runs once)
         var boundsListener = google.maps.event.addListener((map), 'bounds_changed', function(event) {
